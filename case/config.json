@@ -1,0 +1,16 @@
+{
+  "dev": false,
+  "port": 8888,
+  "redis_host": "127.0.0.1",
+  "redis_port": 6379,
+  "redis_pass": "root",
+  "redis_channel": "message",
+  "kafka": [
+    "kafka-0.kafka-svc.pro.svc.cluster.local:9092",
+    "kafka-1.kafka-svc.pro.svc.cluster.local:9092",
+    "kafka-2.kafka-svc.pro.svc.cluster.local:9092"
+  ],
+  "kafka_topic": "message",
+  "queue": 1000,
+  "thread": 10
+}
