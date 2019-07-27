@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"encoding/json"
@@ -31,7 +31,8 @@ type Config struct {
 	Port         int      `json:"port"`
 }
 
-func main() {
+// 加载全局配置
+func ParseConfig() {
 	// 加载配置文件绝对路径
 	configPath := flag.String("c", "c", "")
 	flag.Parse()

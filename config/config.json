@@ -11,6 +11,6 @@
     "kafka-2.kafka-svc.pro.svc.cluster.local:9092"
   ],
   "kafka_topic": "message",
-  "queue": 1000,
-  "thread": 10
+  "queue": 1,
+  "thread": 1
 }
