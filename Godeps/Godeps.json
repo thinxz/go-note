@@ -1,0 +1,46 @@
+{
+	"ImportPath": "github.com/thinxz/go_lang",
+	"GoVersion": "go1.11",
+	"GodepVersion": "v80",
+	"Deps": [
+		{
+			"ImportPath": "github.com/go-redis/redis",
+			"Comment": "v6.8.3",
+			"Rev": "8b4fa6d443e35ca8b1c37be877285252430b06a3"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal",
+			"Comment": "v6.8.3",
+			"Rev": "8b4fa6d443e35ca8b1c37be877285252430b06a3"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/consistenthash",
+			"Comment": "v6.8.3",
+			"Rev": "8b4fa6d443e35ca8b1c37be877285252430b06a3"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/hashtag",
+			"Comment": "v6.8.3",
+			"Rev": "8b4fa6d443e35ca8b1c37be877285252430b06a3"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/pool",
+			"Comment": "v6.8.3",
+			"Rev": "8b4fa6d443e35ca8b1c37be877285252430b06a3"
+		},
+		{
+			"ImportPath": "github.com/go-redis/redis/internal/proto",
+			"Comment": "v6.8.3",
+			"Rev": "8b4fa6d443e35ca8b1c37be877285252430b06a3"
+		},
+		{
+			"ImportPath": "github.com/segmentio/kafka-go",
+			"Comment": "v0.2.0-3-gfd74aea",
+			"Rev": "fd74aea08fe1ca25fdfd51681798dd76821f12b6"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "cbe0f9307d0156177f9dd5dc85da1a31abc5f2fb"
+		}
+	]
+}
