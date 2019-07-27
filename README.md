@@ -1,1 +1,1 @@
-# go_lang
+# go_lang 1.12.5
