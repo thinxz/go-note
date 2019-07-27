@@ -1,13 +1,12 @@
 // REDIS 客户端, 订阅消息并解析
 // 解析消息推送到KAFKA
-package main
+package config
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/segmentio/kafka-go"
-	"github.com/thinxz/go_lang/config"
 	"golang.org/x/net/context"
 	"io"
 	"log"
@@ -36,27 +35,19 @@ type Message struct {
 	Origin string `json:"origin"`
 }
 
-func main() {
-	// 初始化
-	InitRedis()
-
-	// 开启订阅并处理
-	Sub()
-}
-
 // 加载配置, 创建REDIS客户端, 开启多协程处理
-func InitRedis() {
+func Init() {
 
 	//
-	config.ParseConfig()
+	ParseConfig()
 
 	// 创建通道, 设置队列 [最大缓冲数量]
-	queue = make(chan string, config.GlobalConfig.Queue)
+	queue = make(chan string, GlobalConfig.Queue)
 
 	// REDIS 客户端
 	redisClient = redis.NewClient(&redis.Options{
-		Addr:       fmt.Sprintf("%s:%d", config.GlobalConfig.RedisHost, config.GlobalConfig.RedisPort),
-		Password:   config.GlobalConfig.RedisPass,
+		Addr:       fmt.Sprintf("%s:%d", GlobalConfig.RedisHost, GlobalConfig.RedisPort),
+		Password:   GlobalConfig.RedisPass,
 		MaxRetries: 2,
 	})
 
@@ -65,8 +56,8 @@ func InitRedis() {
 
 	// KAFKA 写入流
 	write = kafka.NewWriter(kafka.WriterConfig{
-		Brokers:      config.GlobalConfig.Kafka,
-		Topic:        config.GlobalConfig.KafkaTopic,
+		Brokers:      GlobalConfig.Kafka,
+		Topic:        GlobalConfig.KafkaTopic,
 		BatchSize:    500,
 		BatchTimeout: time.Minute,
 		Async:        true,
@@ -74,7 +65,7 @@ func InitRedis() {
 	})
 
 	// 创建多协程, 同步处理
-	for i := 0; i < config.GlobalConfig.Thread; i++ {
+	for i := 0; i < GlobalConfig.Thread; i++ {
 		go loop(i)
 	}
 }
@@ -87,7 +78,7 @@ func Sub() {
 	isClose = false
 
 	// 订阅
-	sub := redisClient.Subscribe(config.GlobalConfig.RedisChannel)
+	sub := redisClient.Subscribe(GlobalConfig.RedisChannel)
 
 	count := 0
 	for {
