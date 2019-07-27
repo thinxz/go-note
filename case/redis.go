@@ -1,19 +1,27 @@
-// REDIS 客户端, 订阅消息并解析处理
+// REDIS 客户端, 订阅消息并解析
+// 解析消息推送到KAFKA
 package main
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis"
+	"github.com/segmentio/kafka-go"
 	"github.com/thinxz/go_lang/config"
+	"golang.org/x/net/context"
 	"io"
 	"log"
 	"strings"
+	"time"
 )
 
 var (
-	redisClient *redis.Client // REDIS客户端
-	queue       chan string   // 队列通道
+	redisClient *redis.Client      // REDIS客户端
+	queue       chan string        // 队列通道
+	write       *kafka.Writer      // KAFKA 写入流
+	ctx         context.Context    //
+	cancel      context.CancelFunc //
+	isClose     = true             // 是否关闭 [false 开启,  true 关闭]
 )
 
 // 消息对象定义
@@ -52,6 +60,19 @@ func InitRedis() {
 		MaxRetries: 2,
 	})
 
+	//
+	ctx, cancel = context.WithCancel(context.Background())
+
+	// KAFKA 写入流
+	write = kafka.NewWriter(kafka.WriterConfig{
+		Brokers:      config.GlobalConfig.Kafka,
+		Topic:        config.GlobalConfig.KafkaTopic,
+		BatchSize:    500,
+		BatchTimeout: time.Minute,
+		Async:        true,
+		Balancer:     &kafka.Hash{},
+	})
+
 	// 创建多协程, 同步处理
 	for i := 0; i < config.GlobalConfig.Thread; i++ {
 		go loop(i)
@@ -61,6 +82,10 @@ func InitRedis() {
 // 开启REDIS 订阅 并处理
 func Sub() {
 	log.Printf("开启REDIS 订阅 并处理 ... ")
+
+	// 开启
+	isClose = false
+
 	// 订阅
 	sub := redisClient.Subscribe(config.GlobalConfig.RedisChannel)
 
@@ -74,7 +99,7 @@ func Sub() {
 		}
 
 		// 发往通道队列
-		if msg != nil {
+		if msg != nil && !isClose {
 			queue <- msg.Payload
 			count++
 		}
@@ -107,6 +132,14 @@ func handle(str string) {
 	if err != nil {
 		log.Printf("解析json出错 ==> [ %v ] [ %v ]", str, err)
 		return
+	}
+
+	err = write.WriteMessages(ctx, kafka.Message{
+		Key:   []byte(msg.No),
+		Value: []byte(msg.Origin),
+	})
+	if err != nil && !isClose {
+		log.Printf("发送KAFKA报错 ==> [ %v ][ %v ]", str, err)
 	}
 
 	// 打印消息
